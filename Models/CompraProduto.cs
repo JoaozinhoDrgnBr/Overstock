@@ -10,7 +10,7 @@ public class CompraProduto
      public Produto Produto { get; set; }
      public int Quantidade { get; set; }
 
-     public CompraProduto(int compraId, Compra compra, int produtoId, Produto produto, int quantidade)
+     public CompraProduto(int compraId, int produtoId, int quantidade)
      {
          if (quantidade <= 0)
          {
@@ -18,9 +18,7 @@ public class CompraProduto
          }
          
          CompraId = compraId;
-         Compra = compra;
          ProdutoId = produtoId;
-         Produto = produto;
          Quantidade = quantidade;
      }
 

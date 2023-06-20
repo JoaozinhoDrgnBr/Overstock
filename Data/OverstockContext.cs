@@ -71,6 +71,10 @@ public class OverstockContext : DbContext
             entity.Property(c => c.Preco)
                 .HasColumnType("decimal(18,2)")
                 .IsRequired();
+
+            entity.Property(c => c.CompraStatus)
+                .IsRequired()
+                .HasDefaultValue("0");
         });
 
         modelBuilder.Entity<Venda>(entity =>
@@ -87,6 +91,10 @@ public class OverstockContext : DbContext
             entity.Property(c => c.Preco)
                 .HasColumnType("decimal(18,2)")
                 .IsRequired();
+
+            entity.Property(v => v.VendaStatus)
+                .HasDefaultValue("0")
+                .IsRequired();
         });
 
         modelBuilder.Entity<CompraProduto>(entity =>
@@ -94,11 +102,11 @@ public class OverstockContext : DbContext
             entity.HasKey(cp => new { cp.CompraId, cp.ProdutoId });
         
             entity.HasOne(cp => cp.Compra)
-                .WithMany()
+                .WithMany(c => c.CompraProdutos)
                 .HasForeignKey(cp => cp.CompraId);
         
             entity.HasOne(cp => cp.Produto)
-                .WithMany()
+                .WithMany(p => p.CompraProdutos)
                 .HasForeignKey(cp => cp.ProdutoId);
         
             entity.Property(cp => cp.Quantidade)
@@ -110,11 +118,11 @@ public class OverstockContext : DbContext
             entity.HasKey(vp => new { vp.VendaId, vp.ProdutoId });
         
             entity.HasOne(vp => vp.Venda)
-                .WithMany()
+                .WithMany(v => v.VendaProdutos)
                 .HasForeignKey(vp => vp.VendaId);
         
             entity.HasOne(vp => vp.Produto)
-                .WithMany()
+                .WithMany(p => p.VendaProdutos)
                 .HasForeignKey(vp => vp.ProdutoId);
         
             entity.Property(vp => vp.Quantidade)

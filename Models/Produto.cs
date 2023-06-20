@@ -13,6 +13,10 @@ public class Produto
     public int Quantidade {get; set;}
     public double Preco_unidade {get; set;}
 
+    public ICollection<CompraProduto> CompraProdutos { get; set; }
+    
+    public ICollection<VendaProduto> VendaProdutos { get; set; }
+
     public Produto(int? id, string nome, string descricao, int categoriaId, int quantidade, double precoUnidade)
     {
         if (String.IsNullOrEmpty(nome))

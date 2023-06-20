@@ -118,7 +118,7 @@ public class UIProduto
             return;
         }
 
-        var categoria = controllerCategoria.ObterPorId(id);
+        var categoria = controllerCategoria.ObterPorId(idcat);
 
         Console.WriteLine("Informe a quantidade de produtos em estoque atualizada");
         int quantidade = Convert.ToInt32(Console.ReadLine());

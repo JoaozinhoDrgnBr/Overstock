@@ -9,9 +9,11 @@ public class Venda
     public string Data {get; set;}
     public double Preco {get; set;}
     
+    public int VendaStatus { get; set; }
     
+    public ICollection<VendaProduto> VendaProdutos { get; set; }
 
-    public Venda(int? id, string cliente, string data, double preco)
+    public Venda(int? id, string cliente, string data, double preco, int vendaStatus)
     {
         if (String.IsNullOrEmpty(cliente))
         {
@@ -30,6 +32,7 @@ public class Venda
         Cliente = cliente;
         Data = data;
         Preco = preco;
+        VendaStatus = vendaStatus;
     }
 
     public Venda()

@@ -1,6 +1,5 @@
 using Overstock.Controller;
 using ConsoleTables;
-using MySqlX.XDevAPI.Relational;
 using Overstock.Models;
 
 namespace Overstock.UserInterfaces;
@@ -33,7 +32,7 @@ public class UICompra
                     atualizarCompra();
                     break;
                 case 6:
-                    visualizarCompras();
+                    visualizarCompraProdutos();
                     break;
                 case 7:
                     deletarCompra();
@@ -66,9 +65,7 @@ public class UICompra
         Console.Clear();
 
         CCompra controller = new CCompra();
-        CCompraProduto controllerComProd = new CCompraProduto();
-        CProduto controllerProduto = new CProduto();
-        
+
         Console.WriteLine("Informe o nome do fornecedor");
         string fornecedor = Console.ReadLine();
         
@@ -78,40 +75,218 @@ public class UICompra
         Console.WriteLine("Informe o preco da compra");
         double preco = Convert.ToDouble(Console.ReadLine());
 
-        var compra = new Compra(null, fornecedor, data, preco);
+        var compra = new Compra(null, fornecedor, data, preco, 0);
         
         controller.Inserir(compra);
+        
+        Console.WriteLine("Compra adicionada!");
     }
-
+    
     public void adicionarItemCompra()
     {
+        UIProduto uiProduto = new UIProduto();
+
+        CCompra controller = new CCompra();
+        CCompraProduto controllerComProd = new CCompraProduto();
+        CProduto controllerProduto = new CProduto();
+        
+        visualizarCompras();
+        
+        Console.WriteLine("Informe o id da compra que quer adicionar itens");
+        int id;
+        if (int.TryParse(Console.ReadLine(), out id) == false)
+        {
+            Console.WriteLine("ERRO: id tem que ser um numero inteiro");
+            return;
+        }
+
+        var compra = controller.ObterPorId(id);
+
+        if (compra.CompraStatus == 1)
+        {
+            Console.WriteLine("Compra já foi confirmada, não pode ser alterada");
+            return;
+        }
+
+        int opcao = 1;
+
+        while (opcao == 1)
+        {
+            uiProduto.visualizarProdutos();
+            Console.WriteLine("Informe o id do produto que deseja adicionar:");
+            int idProduto;
+            if (int.TryParse(Console.ReadLine(), out idProduto) == false)
+            {
+                Console.WriteLine("ERRO: id tem que ser um numero inteiro");
+                return;
+            }
+
+            var produto = controllerProduto.ObterPorId(idProduto);
+            
+            Console.WriteLine("Informe a quantidade desse produto:");
+            int quantidade;
+            if (int.TryParse(Console.ReadLine(), out quantidade) == false)
+            {
+                Console.WriteLine("ERRO: quantidade tem que ser um numero inteiro");
+                return;
+            }
+
+            CompraProduto compraProduto = new CompraProduto(Convert.ToInt32(compra.Id), Convert.ToInt32(produto.Id), quantidade);
+            controllerComProd.Inserir(compraProduto);
+            
+            Console.WriteLine("Produto adicionado a compra!\n");
+            
+            Console.WriteLine("Deseja continuar a inserir? \n1.Sim \n2.Não \n(Qualquer opcao invalida voltará ao menu)");
+            opcao = Convert.ToInt32(Console.ReadLine());
+            if (opcao != 1)
+            {
+                return;
+            }
+        }
         
     }
 
     public void removerItemCompra()
     {
+
+        UIProduto uiProduto = new UIProduto();
+
+        CCompra controller = new CCompra();
+        CCompraProduto controllerComProd = new CCompraProduto();
+        CProduto controllerProduto = new CProduto();
+        List<CompraProduto> compraProdutos = controllerComProd.ObterTodos();
         
+        visualizarCompras();
+        
+        Console.WriteLine("Informe o id da compra que quer remover itens");
+        int id;
+        if (int.TryParse(Console.ReadLine(), out id) == false)
+        {
+            Console.WriteLine("ERRO: id tem que ser um numero inteiro");
+            return;
+        }
+
+        var compra = controller.ObterPorId(id);
+
+        if (compra.CompraStatus == 1)
+        {
+            Console.WriteLine("Compra já foi confirmada, não pode ser alterada");
+            return;
+        }
+
+        int cont = 0;
+        
+        Console.WriteLine("Id: " + compra.Id +" Fornecedor: " + compra.Fornecedor, " Data: " + compra.Data + " Preco: " + compra.Preco);
+        var tabelaProdutos = new ConsoleTable(" " ,"Produto", "Quantidade");
+        foreach(var CompraId in compraProdutos)
+        {
+            if (compra.Id == CompraId.CompraId)
+            {
+                cont++;
+                var produto = controllerProduto.ObterPorId(CompraId.ProdutoId);
+                tabelaProdutos.AddRow(cont ,produto.Nome, Convert.ToString(CompraId.Quantidade));
+            }   
+        }
+
+        tabelaProdutos.Write();
+
+        Console.WriteLine("Informe o número do produto que deseja remover");
+        int index;
+        if (int.TryParse(Console.ReadLine(), out index) == false)
+        {
+            Console.WriteLine("ERRO: numero informado incorretamente");
+            return;
+        }
+        
+        cont = 1;
+        foreach (var CompraId in compraProdutos)
+        {
+            if (cont == index)
+            {
+                controllerComProd.Excluir(CompraId);
+            }
+
+            cont++;
+        }
     }
 
     public void confirmarCompra()
     {
+        CCompra controller = new CCompra();
+        CProduto controllerProduto = new CProduto();
+        CCompraProduto controllerComProd = new CCompraProduto();
+        
+        List<CompraProduto> compraProdutos = controllerComProd.ObterTodos();
+        
+        visualizarCompras();
+        
+        Console.WriteLine("Id da compra que deseja confirmar:");
+        int id;
+        if (int.TryParse(Console.ReadLine(), out id) == false)
+        {
+            Console.WriteLine("ERRO: id tem que ser um numero inteiro");
+            return;
+        }
+        
+        var compra = controller.ObterPorId(id);
+
+        if (compra.CompraStatus == 1)
+        {
+            Console.WriteLine("Compra já foi confirmada, não pode ser alterada");
+            return;
+        }
+
+        foreach (var ProdutoId in compraProdutos)
+        {
+            if (compra.Id == ProdutoId.CompraId)
+            {
+                var produto = controllerProduto.ObterPorId(ProdutoId.ProdutoId);
+                controllerProduto.Atualizar(new Produto(produto.Id, produto.Nome, produto.Descricao, produto.CategoriaId, produto.Quantidade + ProdutoId.Quantidade, produto.Preco_unidade));   
+            }
+        }
+
+        Compra compraConfirmada = new Compra(compra.Id, compra.Fornecedor, compra.Data, compra.Preco, 1);
+        controller.Atualizar(compraConfirmada);
+        
+        Console.WriteLine("Compra confirmada!");
         
     }
 
     public void atualizarCompra()
     {
+        Console.Clear();
         
+        CCompra controller = new CCompra();
+        
+        visualizarCompras();
+        
+        Console.WriteLine("Id da compra que deseja atualizar:");
+        int id;
+        if (int.TryParse(Console.ReadLine(), out id) == false)
+        {
+            Console.WriteLine("ERRO: id tem que ser um numero inteiro");
+            return;
+        }
+        
+        Console.WriteLine("Informe o fornecedor atualizado da compra:");
+        string fornecedor = Console.ReadLine();
+        
+        Console.WriteLine("Informe a data atualizada da compra:");
+        string data = Console.ReadLine();
+        
+        Console.WriteLine("Informe o preco atualizado da compra:");
+        double preco = Convert.ToDouble(Console.ReadLine());
+
+        var compra = new Compra(id, fornecedor, data, preco, 0);
+        controller.Atualizar(compra);
     }
 
     public void visualizarCompras()
     {
         Console.Clear();
-
+        
         CCompra controller = new CCompra();
-        CProduto controllerProduto = new CProduto();
-        CCompraProduto controllerComProd = new CCompraProduto();
         List<Compra> compras = controller.ObterTodos();
-        List<CompraProduto> compraProdutos = controllerComProd.ObterTodos();
 
         var tabela = new ConsoleTable("Id", "Fornecedor", "Preco total","Data da compra");
         foreach (var fornecedor in compras)
@@ -120,6 +295,17 @@ public class UICompra
         }
         
         tabela.Write();
+    }
+    public void visualizarCompraProdutos()
+    {
+
+        CCompra controller = new CCompra();
+        CProduto controllerProduto = new CProduto();
+        CCompraProduto controllerComProd = new CCompraProduto();
+        
+        List<CompraProduto> compraProdutos = controllerComProd.ObterTodos();
+
+        visualizarCompras();
         
         Console.WriteLine("Deseja ver os itens de qual compra? \n" +
                           "Digite o id da compra desejada ou"+
@@ -136,13 +322,51 @@ public class UICompra
         }
 
         var compra = controller.ObterPorId(id);
-        var tabelaProdutos = new ConsoleTable("Id:" + Convert.ToString(compra.Id), "Fornecedor:" + compra.Fornecedor);
+
+        int cont = 0;
         
+        Console.WriteLine("Id: " + compra.Id +" Fornecedor: " + compra.Fornecedor, " Data: " + compra.Data + " Preco: " + compra.Preco);
+        var tabelaProdutos = new ConsoleTable(" " ,"Produto", "Quantidade");
+        foreach(var CompraId in compraProdutos)
+        {
+            if (compra.Id == CompraId.CompraId)
+            {
+                cont++;
+                var produto = controllerProduto.ObterPorId(CompraId.ProdutoId);
+                tabelaProdutos.AddRow(cont ,produto.Nome, Convert.ToString(CompraId.Quantidade));
+            }   
+        }
+
+        tabelaProdutos.Write();
         
     }
 
     public void deletarCompra()
     {
+        Console.Clear();
+
+        CCompra controller = new CCompra();
+        
+        visualizarCompras();
+        
+        Console.WriteLine("Informe o id da compra que deseja remover:");
+        int id;
+        if (int.TryParse(Console.ReadLine(), out id) == false)
+        {
+            Console.WriteLine("ERRO: id tem que ser um numero inteiro");
+            return;
+        }
+        
+        try
+        {
+            var excluir = controller.ObterPorId(id);
+            controller.Excluir(excluir);
+            Console.WriteLine("Compra excluida!");
+        }
+        catch(Exception e)
+        {
+            Console.WriteLine(e);
+        }
         
     }
 }

@@ -8,8 +8,11 @@ public class Compra
     public string Fornecedor {get; set;}
     public string Data {get; set;}
     public double Preco {get; set;}
-
-    public Compra(int? id, string fornecedor, string data, double preco)
+    
+    public int CompraStatus { get; set; }
+    public ICollection<CompraProduto> CompraProdutos { get; set; }
+    
+    public Compra(int? id, string fornecedor, string data, double preco, int compraStatus)
     {
         if (String.IsNullOrEmpty(fornecedor))
         {
@@ -28,6 +31,7 @@ public class Compra
         Fornecedor = fornecedor;
         Data = data;
         Preco = preco;
+        CompraStatus = compraStatus;
     }
 
     public Compra()

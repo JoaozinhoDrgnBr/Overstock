@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Overstock.Data;
 
@@ -10,9 +11,11 @@ using Overstock.Data;
 namespace Overstock.Migrations
 {
     [DbContext(typeof(OverstockContext))]
-    partial class OverstockContextModelSnapshot : ModelSnapshot
+    [Migration("20230619230400_Update3")]
+    partial class Update3
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -46,11 +49,6 @@ namespace Overstock.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int>("CompraStatus")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasDefaultValue(0);
-
                     b.Property<string>("Data")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -76,12 +74,22 @@ namespace Overstock.Migrations
                     b.Property<int>("ProdutoId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("CompraId1")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ProdutoId1")
+                        .HasColumnType("int");
+
                     b.Property<int>("Quantidade")
                         .HasColumnType("int");
 
                     b.HasKey("CompraId", "ProdutoId");
 
+                    b.HasIndex("CompraId1");
+
                     b.HasIndex("ProdutoId");
+
+                    b.HasIndex("ProdutoId1");
 
                     b.ToTable("CompraProduto");
                 });
@@ -136,11 +144,6 @@ namespace Overstock.Migrations
                     b.Property<decimal>("Preco")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("VendaStatus")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasDefaultValue(0);
-
                     b.HasKey("Id");
 
                     b.ToTable("Vendas");
@@ -154,12 +157,22 @@ namespace Overstock.Migrations
                     b.Property<int>("ProdutoId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("ProdutoId1")
+                        .HasColumnType("int");
+
                     b.Property<int>("Quantidade")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("VendaId1")
                         .HasColumnType("int");
 
                     b.HasKey("VendaId", "ProdutoId");
 
                     b.HasIndex("ProdutoId");
+
+                    b.HasIndex("ProdutoId1");
+
+                    b.HasIndex("VendaId1");
 
                     b.ToTable("VendaProduto");
                 });
@@ -167,16 +180,24 @@ namespace Overstock.Migrations
             modelBuilder.Entity("Overstock.Models.CompraProduto", b =>
                 {
                     b.HasOne("Overstock.Models.Compra", "Compra")
-                        .WithMany("CompraProdutos")
+                        .WithMany()
                         .HasForeignKey("CompraId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Overstock.Models.Produto", "Produto")
+                    b.HasOne("Overstock.Models.Compra", null)
                         .WithMany("CompraProdutos")
+                        .HasForeignKey("CompraId1");
+
+                    b.HasOne("Overstock.Models.Produto", "Produto")
+                        .WithMany()
                         .HasForeignKey("ProdutoId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("Overstock.Models.Produto", null)
+                        .WithMany("CompraProdutos")
+                        .HasForeignKey("ProdutoId1");
 
                     b.Navigation("Compra");
 
@@ -197,16 +218,24 @@ namespace Overstock.Migrations
             modelBuilder.Entity("Overstock.Models.VendaProduto", b =>
                 {
                     b.HasOne("Overstock.Models.Produto", "Produto")
-                        .WithMany("VendaProdutos")
+                        .WithMany()
                         .HasForeignKey("ProdutoId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Overstock.Models.Venda", "Venda")
+                    b.HasOne("Overstock.Models.Produto", null)
                         .WithMany("VendaProdutos")
+                        .HasForeignKey("ProdutoId1");
+
+                    b.HasOne("Overstock.Models.Venda", "Venda")
+                        .WithMany()
                         .HasForeignKey("VendaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("Overstock.Models.Venda", null)
+                        .WithMany("VendaProdutos")
+                        .HasForeignKey("VendaId1");
 
                     b.Navigation("Produto");
 

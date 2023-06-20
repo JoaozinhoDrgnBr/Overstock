@@ -1,5 +1,6 @@
 using ConsoleTables;
 using Overstock.Controller;
+using Overstock.Interfaces;
 using Overstock.Models;
 
 namespace Overstock.UserInterfaces;
