@@ -8,7 +8,6 @@ public class Venda
     public string Cliente {get; set;}
     public string Data {get; set;}
     public double Preco {get; set;}
-    
     public int VendaStatus { get; set; }
     
     public ICollection<VendaProduto> VendaProdutos { get; set; }

@@ -1,31 +1,35 @@
-﻿using Overstock.UserInterfaces;
-using Overstock.UserInterfaces;
+﻿using Overstock;
+using Overstock.Services;
 
 public class Program
 {
     public static void Main()
     {
+        Util util = new Util();
+        Console.WriteLine("Bem Vindo ao Overstock!");
+        util.enterClear();
+        
         bool flagMenu = false;
-
+        
         while (flagMenu != true)
         {
             switch (menu())
             {
                 case 1:
-                    UIProduto uiProduto = new UIProduto();
-                    uiProduto.MenuProduto();
+                    GerenciadorProdutos gerenciadorProdutos = new GerenciadorProdutos();
+                    gerenciadorProdutos.MenuProduto();
                     break;
                 case 2:
-                    UICategoria uiCategoria = new UICategoria();
-                    uiCategoria.MenuCategoria();
+                    GerenciadorCategorias gerenciadorCategorias = new GerenciadorCategorias();
+                    gerenciadorCategorias.MenuCategoria();
                     break;
                 case 3:
-                    UIVenda uiVenda = new UIVenda();
-                    uiVenda.MenuVenda();
+                    GerenciadorVendas gerenciadorVendas = new GerenciadorVendas();
+                    gerenciadorVendas.MenuVenda();
                     break;
                 case 4:
-                    UICompra uiCompra = new UICompra();
-                    uiCompra.MenuCompra();
+                    GerenciadorCompras gerenciadorCompras = new GerenciadorCompras();
+                    gerenciadorCompras.MenuCompra();
                     break;
                 case 0:
                     flagMenu = true;
