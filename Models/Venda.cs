@@ -22,7 +22,7 @@ public class Venda
         {
             throw new ArgumentException("ERRO: Data deve ser inserida corretamente");
         }
-        if (preco <= 0)
+        if (preco < 0)
         {
             throw new ArgumentException("ERRO: Informe um preco válido");
         }
